@@ -1,0 +1,57 @@
+# MRL 多模态检索 —— 唯一设置来源（改这里，别改代码）
+paths:
+  # ↓↓↓ 换机器时只需改这两行（数据由 scripts/00_fetch_data.py 与 09_fetch_coco.py 下载到这里）
+  data_root:   D:/datasets/flickr30k
+  coco_root:   D:/datasets/coco       # 跨域干扰项 + 跨域基准（见 RESULTS.md §5 的测量注意）
+  output_root: ./outputs
+model:
+  name: ViT-B-16
+  pretrained: laion2b_s34b_b88k
+  device: cuda
+  precision: fp16              # 特征抽取精度
+data:
+  batch_size_extract: 256
+  num_workers: 4
+  holdout_train: 6000          # 从 Flickr30k train 留出、不参与训练，作**同域**干净干扰项
+  use_holdout: false           # 默认 false，保持 §九bis 头牌结果用满 29,000 训练；
+                               # 干净同域实验用 --set data.use_holdout=true 另训一对 *_ho
+mrl:
+  dims: [32, 64, 128, 256, 512]   # 嵌套档位 = 评测档位
+  full_dim: 512
+adapter:
+  hidden: 1024                  # 内部隐藏宽度；输出恒为 512（=嵌入维度）
+  shared: true                  # 图文共享同一 adapter
+loss:
+  # 消融结论（见方案 §九ter）：τ 必须可学（固定 0.07 全面垫底，可学收敛到 ≈0.055）；
+  # per_dim 无用（5 个 τ_m 收敛到几乎同一个数）；c=inverse 低维最好。
+  temperature: { mode: learnable, init: 0.07 }   # fixed | learnable | per_dim
+  weight:      { mode: inverse }                 # equal | inverse | linear
+  nested: true                               # true=MRL；false=无嵌套消融
+train:
+  epochs: 20
+  batch_size: 1024              # 缓存特征上可开很大
+  lr: 1.0e-3
+  weight_decay: 0.01
+  seed: 42
+lora:                          # Phase 2：解冻骨干（scripts/06_train_lora.py）
+  r: 8
+  alpha: 16
+  dropout: 0.0
+  targets: [in_proj, out_proj, mlp]   # in_proj=融合的q/k/v | out_proj | mlp
+  towers: [visual, text]
+  epochs: 5
+  batch_size: 256              # 实测 8GB 显存下 384 才到 6.66GB；256 留余量
+  lr: 1.0e-4                   # 骨干 LoRA 的 LR，远低于 adapter 的 1e-3
+  adapter_lr: 1.0e-4
+  weight_decay: 0.01
+  grad_checkpointing: true
+  init_adapter: adapter_mrl    # 从 Phase 1 的 adapter 热启动；null=从零训
+  distill: 0.0                 # 对**冻结 CLIP 原始嵌入**的余弦蒸馏权重（抗遗忘）；0=关
+                               # 目标直接取 outputs/features 里缓存的原始特征，几乎零成本
+eval:
+  directions: [i2t, t2i]
+  gallery: full_31k             # 延迟/存储用大图库
+  faiss_index: flat             # flat | ivf
+  precisions: [fp32, fp16, int8]
+experiment:
+  name: adapter_mrl             # 结果/checkpoint 命名，便于四组区分
