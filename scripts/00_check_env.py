@@ -20,7 +20,7 @@ def main():
         print("  cuda available:", av, "| device:", torch.cuda.get_device_name(0) if av else "-")
     except Exception:
         pass
-    print("OK" if ok else "缺依赖，见上；按 README / 实现方案 Step 0 安装")
+    print("OK" if ok else "缺依赖，见上；按 README 的「环境」一节安装")
 
 
 if __name__ == "__main__":

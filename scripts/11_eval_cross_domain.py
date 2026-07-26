@@ -1,13 +1,13 @@
 """Step 11：真正的跨域评测 —— 在 **COCO 自己的检索任务** 上评四组。
 
-与 §九quater 的"跨域级联"区别（容易混）：
+与"跨域级联"（`08_cascade.py --gallery cross_domain`）的区别（容易混）：
   · 跨域级联：任务仍是 Flickr30k 检索，COCO 图只当**干扰项**填大干草堆。
   · 本脚本：query = COCO test 的 caption，正确答案 = COCO test 的图，
     即换了一个**完整的检索任务**，考的是 Flickr30k 上学到的嵌套结构换域后还稳不稳。
 
 PCA 与两个 adapter 都是在 Flickr30k train 上拟合/训练的，**一点 COCO 数据都没见过** —— 这正是要考的。
 参照线：冻结 CLIP 在 COCO 5k test 上的官方数字 i2t 59.44 / t2i 42.31（已逐位复现）。
-不测延迟（延迟只取决于维度，与数据集无关，§九bis 已验证）。
+不测延迟（延迟只取决于维度、与用哪种降维和哪个数据集都无关，已在四组曲线重合上验证过）。
 """
 import sys
 import pathlib

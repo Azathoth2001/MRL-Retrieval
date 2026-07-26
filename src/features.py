@@ -1,6 +1,7 @@
 """特征：抽取并缓存冻结 CLIP 的 512 维 embedding（.npy）及加载接口。★地基★。单一职责：特征缓存。
 
-约定（方案 §8.3）：存**原始未归一化 fp32**；图/文分开存 + id 对齐表；已存在则跳过。
+约定：存**原始未归一化 fp32**（归一化留到用的时候做，否则前缀截断的顺序会被写死）；
+图/文分开存 + id 对齐表；已存在则跳过。
 .npy 为唯一真源。之后 PCA / adapter 训练 / 四组评测全在缓存上跑。
 """
 from __future__ import annotations
@@ -128,10 +129,11 @@ def load_features(cfg, split, modality):
 
 
 def load_gallery(cfg, splits=("train", "val", "test")):
-    """拼出 ~31k 全量图库（延迟/存储用，方案 §六）。返回 (emb[N,512] fp32, ids[N])。
+    """拼出 ~31k 全量图库（测延迟/存储用：1000 图太小，任何维度都亚毫秒、看不出差异）。
+    返回 (emb[N,512] fp32, ids[N])。
 
     ⚠️ 含 29,000 张 adapter 训练过的 train 图 —— 做**召回**的跨组比较时不能用这个图库，
-    见方案 §九quater 的混杂因素说明；干净图库用 `load_clean_gallery`。
+    见 RESULTS.md §5 的测量注意；干净图库用 `load_clean_gallery`。
     """
     embs, ids = [], []
     for s in splits:

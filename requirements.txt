@@ -1,5 +1,5 @@
-# torch/torchvision 请用官方 CUDA index 单独装（见 README / 实现方案 Step 0）：
-# pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+# torch/torchvision 不在这里列 —— 请按自己的 CUDA 版本从官方 index 单独装，例如：
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
 open_clip_torch
 faiss-cpu
 numpy
@@ -10,6 +10,6 @@ tqdm
 pyyaml
 huggingface_hub          # 取数据（scripts/00_fetch_data.py）；数据落盘后运行期不再需要
 pillow
-# Phase 2（可选）：
-# peft
-# accelerate
+
+# 注：Phase 2 的 LoRA 是手写的（src/lora.py），**不需要 peft** ——
+# OpenCLIP 的 q/k/v 融合在 nn.MultiheadAttention 的裸 in_proj_weight 里，peft 挂不到那个位点。

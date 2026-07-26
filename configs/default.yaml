@@ -13,7 +13,7 @@ data:
   batch_size_extract: 256
   num_workers: 4
   holdout_train: 6000          # 从 Flickr30k train 留出、不参与训练，作**同域**干净干扰项
-  use_holdout: false           # 默认 false，保持 §九bis 头牌结果用满 29,000 训练；
+  use_holdout: false           # 默认 false：主结果用满 29,000 张训练；
                                # 干净同域实验用 --set data.use_holdout=true 另训一对 *_ho
 mrl:
   dims: [32, 64, 128, 256, 512]   # 嵌套档位 = 评测档位
@@ -22,7 +22,7 @@ adapter:
   hidden: 1024                  # 内部隐藏宽度；输出恒为 512（=嵌入维度）
   shared: true                  # 图文共享同一 adapter
 loss:
-  # 消融结论（见方案 §九ter）：τ 必须可学（固定 0.07 全面垫底，可学收敛到 ≈0.055）；
+  # 消融结论（见 RESULTS.md §4）：τ 必须可学（固定 0.07 全面垫底，可学收敛到 ≈0.055）；
   # per_dim 无用（5 个 τ_m 收敛到几乎同一个数）；c=inverse 低维最好。
   temperature: { mode: learnable, init: 0.07 }   # fixed | learnable | per_dim
   weight:      { mode: inverse }                 # equal | inverse | linear

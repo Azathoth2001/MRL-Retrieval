@@ -138,8 +138,9 @@ def get_coco_splits(cfg, splits=("test", "restval")):
 def train_holdout_indices(n_train, n_holdout):
     """确定性地把 train 切成 (训练用下标, 留出下标)，两者都已排序。
 
-    留出的这批图**不参与任何训练**，用作**同域**干净干扰项 —— 修 §九quater 那个
-    "31k 图库里含 adapter 训练过的图，于是 top-1 优势消失" 的混杂因素。
+    留出的这批图**不参与任何训练**，用作**同域**干净干扰项 —— 修的是
+    "图库里含 adapter 训练过的图，于是它们变成更强的假正例、把训练过的条件压下去"
+    这个混杂因素（见 RESULTS.md §5 的测量注意）。
     同一 (n_train, n_holdout) 永远给出同一切分（见 HOLDOUT_SEED）。
     """
     import numpy as np

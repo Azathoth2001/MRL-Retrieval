@@ -1,7 +1,7 @@
 """Step 9：取 MS-COCO（Karpathy split）到 cfg.paths.coco_root。用途有两个：
 
-1. **干净的跨域干扰池** —— restval 的 30,504 张，adapter 从没见过，用来修 §九quater 那个
-   "31k 图库里含训练过的图" 的混杂因素。
+1. **干净的跨域干扰池** —— restval 的 30,504 张，adapter 从没见过，用来修
+   "图库里含训练过的图" 这个混杂因素（见 RESULTS.md §5 的测量注意）。
 2. **跨域基准** —— test 的 5,000 张是标准 MS-COCO 检索基准，官方数字 i2t 59.44 / t2i 42.31，
    既是第二个 sanity check，也用来看 Flickr30k 上训的 adapter 换域后是涨是跌。
 

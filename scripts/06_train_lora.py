@@ -6,8 +6,8 @@
 精度策略：骨干 **fp32 权重 + autocast(fp16) + GradScaler**，而不是 fp16 主权重 ——
 后者配上 LoRA 的小梯度容易下溢。实测 8GB 显存下 batch 384 峰值 6.66GB，故默认 256 留余量。
 
-**必须同时报 Flickr30k 与 COCO**（见 §九quinquies）：冻结 adapter 已经测出"域内赚 0.3~1.0 个点、
-域外亏 4.3~6.0 个点"；LoRA 改的是骨干、遗忘只会更重，只报域内涨幅是没有意义的。
+**必须同时报 Flickr30k 与 COCO**（见 RESULTS.md §6、§7）：冻结 adapter 已经测出"域内赚
+0.3~1.0 个点、域外亏 4.3~6.0 个点"，所以只报域内涨幅是没有意义的。
 
     python scripts/06_train_lora.py                     # 训练 + 双数据集评测
     python scripts/06_train_lora.py --eval-only         # 只用已有 checkpoint 评测
